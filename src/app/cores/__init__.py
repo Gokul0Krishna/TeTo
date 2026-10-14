@@ -1,0 +1,1 @@
+"this folder contains the different atomic services provided by the app"
