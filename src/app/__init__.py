@@ -1,0 +1,1 @@
+"this file contains components for the app and the intialization point for the app"

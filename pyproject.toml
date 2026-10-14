@@ -1,0 +1,20 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "Teto"
+version = "0.1.0"
+description = "My AI slave"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "PyQt6>=6.6.0",
+    "ollama>=0.1.0",
+]
+
+[project.scripts]
+pyqt6-app-trial = "app.main:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/app"]
