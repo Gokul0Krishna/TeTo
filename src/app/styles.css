@@ -1,10 +1,10 @@
 /* style.qss */
 QMainWindow {
-    background-color: #f4f6f9;
+    background-color: #010101e8;
 }
 
 QLineEdit {
-    background-color: #ffffff;
+    background-color: #020202;
     border: 2px solid #3498db;
     border-radius: 4px;
     padding: 6px;
@@ -12,7 +12,7 @@ QLineEdit {
 }
 
 QPushButton {
-    background-color: #2ecc71;
+    background-color: #9d1111;
     color: white;
     border: none;
     border-radius: 4px;
