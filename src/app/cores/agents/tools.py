@@ -20,28 +20,33 @@ def Create_pdf(content: str, filename: str) -> None:
 
 
 @tool
-def findandcreatefolder(base_path: str, relative_path: str) -> str:
-    """Finds a nested folder path; if any part of the path doesn't exist, it creates it.
+def findandcreatefolder(search_query: str) -> str:
+    """Searches for folders matching or partially matching the query inside ~/Desktop/temp/college.
+    If no match is found, creates the folder path.
 
     Args:
-        base_path: The root directory to start from (e.g., "." or "/home/user").
-        relative_path: The partial or nested folder path to find/create (e.g., "college/test").
+        search_query: The folder name or partial path to look for (e.g., "test" or "semester1/assignments").
     """
-    # Combine the base path and the nested relative path
-    target_dir = Path(base_path) / relative_path
-
-    if target_dir.exists() and target_dir.is_dir():
-        msg = f"Found existing directory: {target_dir.resolve()}"
+    # Resolve absolute path for ~/Desktop/temp/college
+    base_dir = Path.expanduser(Path("~/Desktop/temp/College"))
+    base_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Search recursively for directories matching the query pattern
+    matches = [str(p) for p in base_dir.rglob(f"*{search_query}*") if p.is_dir()]
+    
+    if matches:
+        msg = f"Found matching folders:\n" + "\n".join(matches)
         print(msg)
         return msg
     else:
-        # Create all intermediate missing directories automatically
-        target_dir.mkdir(parents=True, exist_ok=True)
-        msg = f"Directory path did not exist. Created: {target_dir.resolve()}"
+        # If no match exists, create the target directory inside the base path
+        target_path = base_dir / search_query
+        target_path.mkdir(parents=True, exist_ok=True)
+        msg = f"No match found. Created folder at: {target_path.resolve()}"
         print(msg)
         return msg
 
 
 if __name__ == "__main__":
-    # Example usage: handles nested partial paths cleanly
-    findandcreatefolder("~/Desktop", "college/test")
+    # Example usage
+    findandcreatefolder("test")
