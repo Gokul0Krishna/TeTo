@@ -1,6 +1,7 @@
 import fpdf2 as pdf
+from smolagents import tool
 
-
+@tool    
 def Create_pdf(content, filename):
     pdf_doc = pdf.FPDF()
     pdf_doc.add_page()
