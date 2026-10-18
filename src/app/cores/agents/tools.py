@@ -48,5 +48,4 @@ def findandcreatefolder(search_query: str) -> str:
 
 
 if __name__ == "__main__":
-    # Example usage
     findandcreatefolder("test")
