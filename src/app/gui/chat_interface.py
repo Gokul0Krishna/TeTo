@@ -104,7 +104,7 @@ class ChatInterface(QMainWindow):
 
         try:
             result = Agent1(text)
-            self._add_message(result.strip(), is_user=False)
+            self._add_message(result, is_user=False)
             self.statusBar().showMessage("Ready", 3000)
         except Exception as e:
             self._add_message(f"⚠ Error: {e}", is_user=False)
