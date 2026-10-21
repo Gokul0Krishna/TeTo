@@ -1,11 +1,6 @@
-from smolagents import CodeAgent, LiteLLMModel, ToolCallingAgent, ChatMessage
 import json
 import ollama
-model = LiteLLMModel(
-    model_id="ollama_chat/qwen2.5-coder:1.5b",
-    api_base="http://127.0.0.1:11434",
-    num_ctx=8192,
-)
+from tools import *
 
 def parse_task(user_query: str) -> dict:
     response = ollama.chat(
@@ -57,73 +52,51 @@ def generate_essay(essay_topic: str) -> str:
     return text
 
 
-# essay_agent = CodeAgent(
-#     tools=[],
-#     model=model,
-#     max_steps=2,
-#     instructions=(
-#         "You are an essay generator. Use only the given topic. "
-#         "Return ONLY the report text. No markdown, no explanation."
-#     ),
-# )
+def _path_resolver(file_path: str, available_paths: list[str]) -> dict:
+    prompt = f"""
+    You are a path matching assistant. 
+    Target path requested by user: "{file_path}"
+    
+    Available existing paths on disk:
+    {json.dumps(available_paths, indent=2)}
 
-# folder_agent = ToolCallingAgent(
-#     tools=[list_all_folder_paths],
-#     model=model,
-#     max_steps=4,
-#     instructions=(
-#         "Find candidate folders for the requested target path. "
-#         "Call list_all_folder_paths once, then return ONLY paths, one per line. "
-#         "If uncertain, return empty."
-#     ),
-# )
+    Task:
+    1. Compare the target path with the available paths. Check for exact matches or case-insensitive matches (e.g., "reports" vs "Reports").
+    2. If a matching or highly similar existing path is found, return THAT existing path.
+    3. If no matching or similar path exists, return the original target path so it can be created.
 
-# pdf_agent = ToolCallingAgent(
-#     tools=[Create_pdf],
-#     model=model,
-#     max_steps=3,
-#     instructions="Use Create_pdf exactly as requested.",
-# )
+    Return ONLY a valid JSON object in this exact format:
+    {{
+      "resolved_path": "string",
+      "exists": true or false,
+      "action": "matched" or "create"
+    }}
+    """
 
+    response = ollama.chat(
+        model='qwen2.5-coder:1.5b',
+        messages=[{"role": "user", "content": prompt}],
+        format="json"
+    )
+    
+    result = json.loads(response['message']['content'])
+    return result
 
-# def run_essay(topic: str) -> str:
-#     return essay_agent.run(
-#         f"Write a concise report on: {topic}. Include introduction, key events/themes, impact, and conclusion."
-#     )
+def path_management_agent(user_target_path: str):
+    available_paths = list_college_folders()
+    decision = _path_resolver(user_target_path, available_paths)
+    return decision
 
-
-# def run_folder_search(target_path: str) -> str:
-#     return folder_agent.run(f"List accessible folder paths and identify anything close to: {target_path}")
-
-
-# def main(user_query: str):
-#     task = parse_task(user_query)
-#     print("Parsed task:", task)
-
-#     with ThreadPoolExecutor(max_workers=2) as ex:
-#         essay_future = ex.submit(generate_essay, task["essaytopic"])
-#         folder_future = ex.submit(find_folders)
-
-#         essay = essay_future.result()
-#         folders = folder_future.result()
-
-#     folder = resolve_folder(task["filepath"], folders)
-#     pdf_path = os.path.join(folder, "report.pdf")
-
-#     result = pdf_agent.run(
-#         f'Call Create_pdf with filename "{pdf_path}" and content:\n{essay}'
-#     )
-#     print(result)
 
 def Agent1(user_query: str):
     task = parse_task(user_query)
     print("Parsed task:", task)
     if task and task['essaytopic'] and task['filepath']:
-        essay = generate_essay(task['essaytopic'])
-        
-    return essay 
+        # essay = generate_essay(task['essaytopic'])
+        file_path = path_management_agent(task['filepath'])
+    return file_path 
 
 if __name__ == "__main__":
-    user_query = "Write a concise report on the impact of climate change on agriculture and save it to /home/user/reports/climate_report.pdf"
+    user_query = "Write a concise report on the impact of climate change on agriculture and save it to /collage/test/"
     result = Agent1(user_query)
     print("Agent1 result:", result)
