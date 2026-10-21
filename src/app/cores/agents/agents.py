@@ -34,6 +34,29 @@ def parse_task(user_query: str) -> dict:
     except Exception as e:
         raise ValueError(f"Model did not return valid JSON:\n{text}") from e
 
+
+def generate_essay(essay_topic: str) -> str:
+    response = ollama.chat(
+        model='qwen2.5-coder:1.5b',
+        messages=[
+            {
+                'role': 'system',
+                'content': (
+                    "You are an essay generator. Write a concise report on the given topic. Return ONLY the report text. No markdown, no explanation."
+                ),
+            },
+            {
+                'role': 'user',
+                'content': essay_topic,
+            },
+        ],
+    )
+    raw = response['message']['content']
+
+    text = raw.content if hasattr(raw, "content") else str(raw)
+    return text
+
+
 # essay_agent = CodeAgent(
 #     tools=[],
 #     model=model,
@@ -95,7 +118,10 @@ def parse_task(user_query: str) -> dict:
 def Agent1(user_query: str):
     task = parse_task(user_query)
     print("Parsed task:", task)
-    return task
+    if task and task['essaytopic'] and task['filepath']:
+        essay = generate_essay(task['essaytopic'])
+        
+    return essay 
 
 if __name__ == "__main__":
     user_query = "Write a concise report on the impact of climate change on agriculture and save it to /home/user/reports/climate_report.pdf"
