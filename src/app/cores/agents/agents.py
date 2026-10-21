@@ -1,7 +1,6 @@
 import json
 import ollama
-from tools import *
-
+from .ai_tools import *
 def parse_task(user_query: str) -> dict:
     response = ollama.chat(
         model='qwen2.5-coder:1.5b',
