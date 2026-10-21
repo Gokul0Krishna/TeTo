@@ -62,7 +62,7 @@ def _path_resolver(file_path: str, available_paths: list[str]) -> dict:
 
     Task:
     1. Compare the target path with the available paths. Check for exact matches or case-insensitive matches (e.g., "reports" vs "Reports").
-    2. If a matching or highly similar existing path is found, return THAT existing path.
+    2. If a matching or highly similar existing path is found, return THAT existing path in WHOLE.
     3. If no matching or similar path exists, return the original target path so it can be created.
 
     Return ONLY a valid JSON object in this exact format:
@@ -92,9 +92,18 @@ def Agent1(user_query: str):
     task = parse_task(user_query)
     print("Parsed task:", task)
     if task and task['essaytopic'] and task['filepath']:
-        # essay = generate_essay(task['essaytopic'])
+        essay = generate_essay(task['essaytopic'])
+        print(essay)
         file_path = path_management_agent(task['filepath'])
-    return file_path 
+        print(file_path)
+        if essay and file_path:
+            resolved_path = file_path['resolved_path']
+            Create_pdf(essay, resolved_path+f"/{task['essaytopic'].replace(' ', '_')}.pdf")
+            return f"Essay generated and saved to: {resolved_path}"
+        else:
+            return "Failed to generate essay or resolve file path."
+    else:
+        return "Invalid task format. Please provide both 'essaytopic' and 'filepath'."
 
 if __name__ == "__main__":
     user_query = "Write a concise report on the impact of climate change on agriculture and save it to /collage/test/"
