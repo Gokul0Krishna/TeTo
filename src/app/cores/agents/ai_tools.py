@@ -54,7 +54,7 @@ def list_music_folders() -> list[str]:
 
 import yt_dlp
 
-def download(url, output_folder):
+def music_download(url, output_folder):
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': f'{output_folder}/%(playlist_title|album|title)s/%(playlist_index)02d - %(title)s.%(ext)s',
