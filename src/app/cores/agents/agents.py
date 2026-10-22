@@ -104,6 +104,7 @@ def Agent1(user_query: str):
     else:
         return "Invalid task format. Please provide both 'essaytopic' and 'filepath'."
 
+
 if __name__ == "__main__":
     user_query = "Write a concise report on the impact of climate change on agriculture and save it to /collage/test/"
     result = Agent1(user_query)

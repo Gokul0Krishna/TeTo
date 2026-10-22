@@ -2,3 +2,4 @@
 src/app/gui/__pycache__/*
 src/app/cores/__pycache__/*
 src/app/cores/agents/__pycache__/*
+test_resources
