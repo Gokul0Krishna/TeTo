@@ -60,10 +60,9 @@ def _path_resolver(file_path: str, available_paths: list[str]) -> dict:
     result = json.loads(response['message']['content'])
     return result
 
-# fix the fucking files saving problem
-
 def path_management_agent(user_target_path: str):
     available_paths = list_music_folders()
+    print(f"Available paths: {available_paths}")
     decision = _path_resolver(user_target_path, available_paths)
     return decision
 
@@ -72,8 +71,10 @@ def music_downloader_agent(query: str) -> None:
     Downloads music from the given URL and saves it to the specified output folder.
     """
     result = parse_task(query)
+    print(f"Parsed result: {result}")
     if result and result['url'] and result['filepath']:
         file_path = path_management_agent(result['filepath'])
+        print(f"Resolved file path: {file_path}")
         music_download(result['url'], file_path['resolved_path'])
         return f"Music downloaded successfully to {file_path['resolved_path']}"
     else:
